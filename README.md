@@ -1,12 +1,12 @@
 # Konsol
 
-The DevOps Console
+The DevOps Console - Experimental Polymer + Electron
 
 ## Development Prerequisites
 
 Before you start following the example, please grab the following dependencies:
 
-  1. Dependency management for tools are managed via Node.js [NPM](https://www.npmjs.com/), Install [Node.js](https://nodejs.org/en/download/) version >= 0.12
+  1. Dependency management for tools are managed via Node.js [NPM](https://www.npmjs.com/), Install [Node.js](https://nodejs.org/en/download/) version >= 4.x and electron >= 1.x
 
   2. Components dependency management using [Bower](http://bower.io/) by running
 
@@ -38,18 +38,7 @@ Before you start following the example, please grab the following dependencies:
      electron .
      ```
 
-## Caveats Of Server-less Architecture
 
- - No caching, potentially firing a lot of requests
-
- - No auth, policies, IP based
-
-
-## Advantages of Server-less Archtecture
-
- - Reduced complexity
-
- - Flexibility through composition
 
 ## konsol-task-sequence
 
