@@ -1,6 +1,6 @@
 # Konsol
 
-The DevOps Console - Experimental Polymer + Electron
+The DevOps Console - Experimental Modular scripting using Polymer web components on server side with Electron.
 
 ## Development Prerequisites
 
