@@ -1,0 +1,44 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+
+
+<script>
+    (function(){
+        var GitHubApi = require("github");
+        var scope;
+
+        Polymer({
+            is: 'file-exist',
+            behaviors: [TaskBehavior],
+            properties: {
+                // Required
+                file: String,
+                // Output
+                sink: {type: Boolean, notify: true}
+
+            },
+
+            // onStart lifecycle ...
+            run: function() {
+                this.log('running...');
+                this.update();
+            },
+
+            update: function(){
+                if (this.file) {
+                    var that = this;
+                    this.resolveUrl(this.file, function(e) {
+                        that.log('file exists!!');
+                        this.sink = true;
+                    }, function(e){
+                        that.log('file does not exist');
+                        that.sink = false;
+                    });
+                }
+
+            }
+
+        });
+    })();
+</script>

@@ -1,0 +1,71 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/task-behavior/task-behavior.html">
+<link rel="import" href="../konsol-exec.html">
+
+
+<!--
+Custom element for executing Ansible playbooks.
+Status: Development
+
+Sintaxis:
+<ansible-playbook playbook="<your_playbook_yml_file" inventory="[inventory_file]">
+
+
+-->
+
+<dom-module id="ansible-playbook" attributes="playbook inventory">
+	<template>
+		<konsol-exec cmd="[[ansible_cmd]]" auto="[[auto_child]]"></konsol-exec>
+	</template>
+
+</dom-module>
+
+<script>
+		Polymer({
+			is: "ansible-playbook",
+			behaviors: [TaskBehavior],
+			properties: {
+				// Host properties
+				playbook: {
+					type: String,
+					value: ''
+				},
+				inventory: {
+					type: String,
+					value: ''
+				},
+
+				// Child properties
+				ansible_cmd: {
+					type: String,
+					value: '',
+					notify: true
+				},
+				auto_child: {
+					type: Boolean,
+					value: false,
+					notify: true
+				}
+
+			},
+			/* Triggered by auto=true (TaskBehavior) */		
+			run: function(){
+				this.ansible_cmd = this._buildAnsibleCmd(this.playbook, this.inventory);
+				this.auto_child = true;
+			},	
+			_buildAnsibleCmd: function(playbook, inventory){
+				cmd_inv = '';
+				if (inventory != '' && typeof inventory !=='undefined') {
+					cmd_inv = ' -i ' + inventory;
+				}
+
+				// build the ansible command
+				cmd = 'ansible-playbook ' + playbook + cmd_inv;
+				console.log('Command: ' + cmd);
+				return cmd
+			}
+		});	
+
+
+
+</script>

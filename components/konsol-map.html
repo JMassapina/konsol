@@ -1,0 +1,70 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+<!--
+
+Example:
+
+<konsol-map in='{"build": 2, "status":"failed"}' f='{"build": x.build + 1, "status": "running"}' out={{result}}></konsol-fmap>
+
+-->
+<script>
+    (function() {
+        var mapPromise = require("map-promise");
+
+        Polymer({
+            is: "konsol-map",
+            behaviors: [TaskBehavior],
+            properties: {
+                in: {
+                    type: Object,
+                    value: undefined
+                },
+                f: {
+                    type: Object
+                },
+                out: {
+                    type: Object,
+                    notify: true
+                }
+
+
+            },
+
+            run: function() {
+                if (!this.in || !this.f){
+                    this.log('[ERROR] Missing properties: in:' + this.in + ', f:' + this.f);
+                    return
+                }
+
+                var that = this;
+
+                // sanitize the `in` property. Convert to array if it is just one element
+
+                if (!(this.in.constructor === Array)) {
+                    that.log('[WARN] parameter `in` been casted to an array');
+                    this.in = [this.in];
+                }
+
+                // define map function
+                var mapFunc = function(elem, cb){
+                    var body = "return " + that.f + ";";
+                    var applyF = new Function("x", body);
+                    var result = applyF(elem);
+
+                    cb(null, result);
+                };
+
+                // apply map and yield result
+                mapPromise(this.in, mapFunc)
+                        .then(function(result){
+                            that.out = result;
+                            that.log('output: '+ JSON.stringify(that.out));
+                            this.done = true;
+                        });
+
+            }
+
+        });
+    })();
+</script>

@@ -1,0 +1,53 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="mark-down">
+    <template>
+        <div id="md2html"></div>
+    </template>
+
+</dom-module>
+
+<script>
+    (function(){
+        var showdown = require('showdown');
+        var converter = new showdown.Converter();
+
+        Polymer({
+            is: 'mark-down',
+            properties: {
+                text: {
+                    type: String,
+                    observer: '_textChanged',
+                    value: function() { return this.text || this.textContent; }
+                }
+            },
+            _textChanged: function() {
+                this.$.md2html.innerHTML = this._convert2html(this.text);
+            },
+
+            _convert2html: function(text){
+                converter.setOption('omitExtraWLInCodeBlocks', true);
+                converter.setOption('tables', true);
+                converter.setOption('tablesHeaderId', true);
+                return converter.makeHtml(this._unindent(text));
+            },
+
+            // Find the shortest indented line (ignoring blank lines), and remove all
+            // indentation up to that point.
+            _unindent: function(str) {
+                // two spaces for tabs as a guess - we don't want to get into the business
+                // of trying to detect tab sizes.
+                var lines  = str.replace(/\t/g, '  ').split('\n');
+                var indent = lines.reduce(function(prev, line) {
+                    if (/^\s*$/.test(line)) return prev;  // Completely ignore blank lines.
+                    var lineIndent = line.match(/^(\s*)/)[0].length;
+                    if (prev === null) return lineIndent;
+                    return lineIndent < prev ? lineIndent : prev;
+                }, null);
+                return lines.map(function(l) { return l.substr(indent); }).join('\n');
+                return str.replace(/^[^\S\n]+/gm, '');
+            }
+
+        });
+    })();
+</script>

@@ -1,0 +1,59 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<dom-module id="http-route">
+    <template>
+        <content></content>
+    </template>
+</dom-module>
+
+
+<script>
+    (function() {
+        var bodyparser = require('body-parser');
+        Polymer({
+            is: "http-route",
+            properties: {
+                method: {
+                    type: String,
+                    value: "all"
+                },
+                path: {
+                    type: String,
+                    value: ""
+                },
+                jsonparser: {
+                    type: Boolean,
+                    value: false
+                },
+                lambda:{
+                    type: String
+                }
+
+            },
+
+            addRoute: function(expressapp){
+                var that= this;
+
+                var handler = function(req, res){
+                    if (that.lambda){
+                        var handlerFunc = new Function("req","res", that.lambda);
+                        handlerFunc(req, res)
+
+                    }else{
+                        var srv = Polymer.dom(that).children[0];
+                        if (srv.isService())
+                            srv.handle(req, res);
+                    };
+                };
+
+                // create the route
+                if (this.jsonparser) {
+                    this._jsonParser = bodyparser.json();
+                    expressapp[this.method.toLowerCase()](this.path, this._jsonParser, handler);
+                } else {
+                    expressapp[this.method.toLowerCase()](this.path, handler);
+                }
+            }
+        });
+    })();
+</script>

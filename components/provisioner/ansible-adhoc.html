@@ -1,0 +1,87 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/task-behavior/task-behavior.html">
+<link rel="import" href="../konsol-exec.html">
+
+
+<!--
+Custom element for executing Ansible ad-hoc commands and playbooks.
+Status: Development
+
+Sintaxis:
+<ansible-adhoc target="" module="ping" args="[module_args]" inventory="[inventory_file]">
+
+Examples:
+<ansible-adhoc target="local" module="ping" inventory="etc/ansible/hosts"></ansible-adhoc>
+<ansible-adhoc target="local" module="command" args="/usr/bin/uptime" inventory="etc/ansible/hosts"></ansible-adhoc>
+
+-->
+<dom-module id="ansible-adhoc" attributes="target module args inventory">
+	<template>
+		<konsol-exec cmd="[[ansible_cmd]]" auto="[[auto_child]]"></konsol-exec>
+	</template>
+
+</dom-module>
+
+<script>
+		Polymer({
+			is: "ansible-adhoc",
+			behaviors: [TaskBehavior],
+			properties: {
+				// Host properties
+				target: {
+					type: String,
+					value: ''
+				},
+				module: {
+					type: String,
+					value: ''
+				},
+				args: {
+					type: String,
+					value: ''
+				}, 
+				inventory: {
+					type: String,
+					value: ''
+				},
+
+				// Child properties
+				ansible_cmd: {
+					type: String,
+					value: '',
+					notify: true
+				},
+				auto_child: {
+					type: Boolean,
+					value: false,
+					notify: true
+				}
+
+			},
+			/* Triggered by auto=true (TaskBehavior) */		
+			run: function(){
+				this.ansible_cmd = this._buildAnsibleCmd(this.target, this.module, this.args, this.inventory);			
+				this.auto_child = true;
+			},	
+			_buildAnsibleCmd: function(target, module, args, inventory){
+				// sanitize some optional parameters
+				cmd_args = '';
+				cmd_inv = '';
+				if (args != '' && typeof args !== 'undefined') {
+					cmd_args = ' -a "' + args + '"';
+				};
+				if (inventory != '' && typeof inventory !=='undefined') {
+					cmd_inv = ' -i ' + inventory
+				}
+				// build the ansible command
+				cmd = 'ansible ' + target + ' -m ' + module + cmd_args + cmd_inv;
+				console.log('Command: ' + cmd);
+				return cmd
+			}
+		});	
+
+
+
+</script>
+
+

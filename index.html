@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KapalHQ - Konsol</title>
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="bower_components/polymer/polymer.html">
+    <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="bower_components/iron-pages/iron-pages.html">
+    <link rel="import" href="components/konsol-components-loader.html">
+    <!-- ui  -->
+    <link rel="import" href="components/konsol-exec.html">
+    <link rel="import" href="components/konsol-editor.html">
+    <link rel="import" href="components/konsol-markdown.html">
+    <link rel="import" href="components/konsol-scripts-panel.html">
+    <link rel="import" href="components/konsol-markdown-panel.html">
+    <link rel="import" href="components/ui/action-pages.html">
+    <link rel="import" href="components/ui/mark-down.html">
+    <link rel="import" href="components/ui/konsol-button.html">
+    <link rel="import" href="components/konsol-task-sequence.html">
+    <link rel="import" href="components/konsol-task-concurrent.html">
+    <link rel="import" href="components/konsol-map.html">
+    <link rel="import" href="components/konsol-ask.html">
+    <link rel="import" href="components/konsol-toast.html">
+
+    <!-- poly server -->
+
+
+    <style>
+        body {
+            background-color: #222222;
+            color: #FEFEFE;
+            font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
+        }
+        .menuPanel {
+            width: 300px;
+        }
+        /*
+        body /deep/ .ace_scrollbar {
+          display: none !important;
+        }
+        */
+
+        body /deep/ .ace_scrollbar::-webkit-scrollbar {
+            width: 0.5em;
+        }
+
+        body /deep/ .ace_scrollbar::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        }
+
+        body /deep/ .ace_scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(100, 100, 100, 0.8);
+        }
+
+        body /deep/ .ace_scrollbar::-webkit-scrollbar-corner,
+        body /deep/ .ace_scrollbar::-webkit-scrollbar-thumb:window-inactive {
+            background: rgba(100, 100, 100, 0.4);
+        }
+
+    </style>
+    <style is="custom-style">
+        [vertical] {
+        @apply(--layout-vertical);
+        }
+        [horizontal]{
+        @apply(--layout-horizontal);
+        }
+    </style>
+
+</head>
+<body unresolved>
+
+    <div horizontal>
+    <konsol-components-loader id="loader"></konsol-components-loader>
+    </div>
+    <template is="dom-bind" id="signals">
+      <iron-signals on-iron-signal-viewselect="handleViewSelect"></iron-signals>
+    </template>
+
+    <div horizontal>
+    <div class="menuPanel" vertical>
+        <img height="80" width="80" src="img/kapal_logo_white.png"/>
+        <konsol-scripts-panel></konsol-scripts-panel>
+    </div>
+    <iron-pages id="pages" selected="0">
+        <konsol-editor></konsol-editor>
+    </iron-pages>
+</div>
+
+<script>
+    document.querySelector("#signals").handleViewSelect = function(e, detail, sender) {
+      document.querySelector("#pages").selected = e.detail;
+    };
+
+    window.addEventListener('WebComponentsReady', function(e) {
+        document.querySelector("#loader").fire('konsol-components-load',{data: 'load'});
+    });
+
+</script>
+</body>
+
+</html>

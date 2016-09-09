@@ -1,0 +1,77 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<!--
+
+Example:
+
+<aws-ec2-create config="{{awsConfig}}" imageid="ami-e3eb9fd9"></aws-ec2-create>
+
+@element aws-ec2-create
+
+-->
+<script>
+(function(){
+  var AWS = require('aws-sdk');
+
+  Polymer({
+    is: 'aws-ec2-create',
+    properties: {
+        /**
+         * Required
+         * AWS Config object
+         */
+        config: {
+            type: Object,
+            value: undefined,
+            observer: 'changeConfigUpdate'
+        },
+        /**
+         * Required
+         * The ID of the AMI. For a list of public AMIs provided by Amazon, see Amazon Machine Images:
+         * http://aws.amazon.com/marketplace/search/results/&searchTerms=AMISAWS?browse=1
+         */
+        imageid: {
+            type: String,
+            value:'',
+            observer: 'update'
+        }
+
+    },
+
+    update: function(){
+        //Abort if the config is not avail yet
+        if (! this.config){
+            return
+        }
+
+        //memoize
+        if (! this.ec2){
+            this.ec2 = new AWS.EC2(this.config)
+        }
+
+        console.log('--> Preparing request ...');
+        // create the params
+        var params = {
+            ImageId: this.imageid,
+            MaxCount: 1,
+            MinCount: 1,
+            InstanceType: 'm1.small'
+        };
+
+        // Fire the request to AWS
+        console.log('--> Sending request to AWS ...');
+        this.ec2.runInstances(params, function(err, data){
+            if (err)  console.log('--> [ERROR] ' + err.stack); //err.stack
+            else      console.log('==> EC2 Instance created successfully. InstanceId: ' + data.Instances[0].InstanceId);
+        });
+
+
+
+    },
+    changeConfigUpdate: function(){
+        // Delete any memoized client
+        delete this.ec2;
+        this.update();
+    }
+  });
+})();
+</script>

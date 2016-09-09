@@ -1,0 +1,32 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/task-behavior/task-behavior.html">
+
+<script>
+
+(function(){
+  /*Electron Specific*/
+  const {ipcRenderer} = require('electron')
+
+  Polymer({
+    is: 'konsol-exec',
+    behaviors: [TaskBehavior],
+    ready: function() {
+      var that = this;
+      ipcRenderer.on('konsol-cmd-result', function(event, arg){
+        that.done = true;
+      });
+    },
+    properties: {
+      cmd: {
+        type: String,
+        notify: true
+      }
+    },
+    run: function() {
+      var cmd_args = this.cmd.split(" ");
+      ipcRenderer.send('konsol-cmd', { "cmd": cmd_args[0], "args": cmd_args.slice(1,cmd_args.length)});
+      //console.log(cmd_args[0],cmd_args.slice(1,cmd_args.length));
+    }
+  });
+})();
+</script>

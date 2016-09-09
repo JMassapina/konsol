@@ -1,0 +1,89 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<!--
+Element `aws-config` exports an AWS configuration object based on the credentials
+and attributes provided and that can be used to configure other AWS
+web components.
+
+Example:
+
+
+    <aws-node-config region="ap-southeast-2"
+                     access="<your_access_key>"
+                     secret="<your_secret_key>"
+                     sink="{{awsConfig}}">
+    </aws-node-config>
+
+@element aws-node-config
+
+-->
+
+<script>
+(function() {
+    var AWS = require('aws-sdk');
+
+    Polymer({
+        is: "aws-config",
+        properties: {
+            /**
+             * Required.
+             * The credentials object that contains authentication keys
+             */
+            access: {
+                type: String
+            },
+            /**
+             * Required
+             */
+            secret: {
+                type: String
+            },
+            /**
+             * Required
+             */
+            region: {
+                type: String
+            },
+//            /**
+//             * Whether SSL is enabled or not
+//             */
+//            ssl: {
+//                type: Boolean
+//            },
+//            /**
+//             * To control the number of retries for a request
+//             */
+//            maxretries: {
+//                type: String,
+//                value: '3'
+//            },
+
+            /**
+             * The read-only `sink` attribute exports the current configuration
+             * object based on the provided attributes.
+             */
+            sink: {
+                type: Object,
+                value: undefined,
+                notify: true
+            }
+
+        },
+
+        observers: [
+            '_update(access, secret, region)'
+        ],
+
+        _update: function(access, secret, region){
+            console.log('--> Initiating AWS Config ...');
+
+            AWS.config.update({accessKeyId: access, secretAccessKey: secret});
+            AWS.config.region = region;
+            this.sink = AWS.config;
+
+            console.log('==> AWS Config instantiated successfully: ' + JSON.stringify(this.sink));
+        }
+
+    });
+})();
+</script>

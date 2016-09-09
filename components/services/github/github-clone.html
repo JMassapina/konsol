@@ -1,0 +1,106 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+<link rel="import" href="../../konsol-exec.html">
+
+
+<!--
+Documentation: https://www.npmjs.com/package/github
+
+-->
+
+<dom-module id="github-clone">
+    <template>
+        <konsol-exec start={{gitCloneCommand}} cmd="{{gitCloneCommand}}"></konsol-exec>
+    </template>
+
+</dom-module>
+
+<script>
+    (function(){
+        var GitHubApi = require("github");
+
+        Polymer({
+            is: 'github-clone',
+            behaviors: [TaskBehavior],
+            properties: {
+                // Required
+                config: Object,
+
+                // Required
+                user: String,
+
+                // Required
+                repo: String,
+
+                // Required
+                branch: String,
+
+                // Required
+                gitCloneCommand: {type: String, notify: true},
+
+                // Required
+                checkout: String
+
+            },
+
+            // onStart lifecycle ...
+            run: function() {
+                this.log("Starting...");
+                // Check whether mandatory properties have been set
+                if (!this.config || ! this.user || ! this.repo || ! this.branch) {
+                    this.log('[WARN] Missing required fields: config, user, repo, title');
+                    return
+                }
+
+
+                //memoize
+                if (! this.github){
+                    this.github = new GitHubApi({
+                        // required
+                        version: "3.0.0",
+                        headers: {
+                            "user-agent": "Konsol" // GitHub is happy with a unique user agent
+                        }
+                    });
+                }
+
+                this.log('Preparing request to Github');
+                // send request to github
+                this._cloneRepo(this.user, this.repo, this.branch);
+            },
+
+            _cloneRepo: function(user, repo, branch){
+
+                this.log('[INFO] Authenticating username: ' + this.config.username + '...');
+                this.github.authenticate({
+                    type: "basic",
+                    username: this.config.username,
+                    password: this.config.password
+                });
+
+                var repo = ' https://github.com/' + this.user + '/' + this.repo +'.git ';
+
+                var cmd = 'git clone ' + repo + this.checkout;
+                this.log('Command: ' + cmd);
+
+                this.gitCloneCommand = cmd;
+
+
+                // FIXME(javier): Not found yet the way to clone via api
+//                var params = {
+//                    user: user,
+//                    repo: repo
+//
+//                };
+//
+//                this.github.repos.getReadme(params, function(err, data){
+//                    if (err)  scope.log('[ERROR] ' + err);
+//                    else      scope.log('[INFO] GitHub reponse: ' + JSON.stringify(data));
+//                    this.done = true;
+//                });
+
+            }
+
+        });
+    })();
+</script>

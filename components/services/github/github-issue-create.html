@@ -1,0 +1,103 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+<!--
+Documentation: https://www.npmjs.com/package/github
+
+Example:
+
+# Fetching by id: `<github-gist-get id="<your_id>">`
+# Fetching by username: `<github-gist-get user="jteso">`
+
+@element github-issue-create
+
+-->
+<script>
+    (function(){
+        var GitHubApi = require("github");
+        var scope;
+
+        Polymer({
+            is: 'github-issue-create',
+            behaviors: [TaskBehavior],
+            properties: {
+                // Required
+                config: Object,
+
+                // Required
+                user: Object,
+
+                // Required
+                repo: String,
+
+                // Required
+                title: String,
+
+                // Optional
+                body: { type: String, value: ''},
+
+                // Optional.
+                assignee: { type: String, value: '' }
+
+            },
+
+            // onStart lifecycle ...
+            run: function() {
+                this.update();
+            },
+
+            update: function(){
+                // Check whether mandatory properties have been set
+                if (!this.config || ! this.user || ! this.repo || ! this.title) {
+                    this.log('[WARN] Missing required fields: config, user, repo, title');
+                    return
+                }
+
+
+                //memoize
+                if (! this.github){
+                    this.github = new GitHubApi({
+                        // required
+                        version: "3.0.0",
+                        headers: {
+                            "user-agent": "Konsol" // GitHub is happy with a unique user agent
+                        }
+                    });
+                }
+
+
+                // send request to github
+                this._sendGithubRequest(this.user, this.repo, this.title, this.body, this.assignee);
+            },
+
+            _sendGithubRequest: function(user, repo, title, body, assignee){
+                // Hacky way to reach the konsol.log inside the callback.
+                scope = this;
+
+                var params = {
+                    title: title,
+                    body: body,
+                    user: user,
+                    assignee: assignee,
+                    repo: repo
+                };
+
+                this.log('[INFO] Authenticating username: ...' + this.config.username);
+                this.github.authenticate({
+                    type: "basic",
+                    username: this.config.username,
+                    password: this.config.password
+                });
+
+                this.log('Creating issue with title: ' + this.title + ' ...');
+                this.github.issues.create(params, this._handleResponse);
+
+            },
+            _handleResponse: function(err, data){
+                if (err)  scope.log('[ERROR] ' + err);
+                else      scope.log('[INFO] GitHub reponse: ' + JSON.stringify(data));
+            }
+
+        });
+    })();
+</script>

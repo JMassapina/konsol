@@ -1,0 +1,43 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+<!--
+lokidb-load: Creates a database. This class is only used to initialise the database, add collections and load/save.
+
+
+-->
+
+<script>
+    (function() {
+        var loki = require("lokijs");
+
+        Polymer({
+            is: "lokidb-findmax",
+            behaviors: [TaskBehavior],
+            properties: {
+                col: {
+                    type: Object,
+                    value: undefined
+                },
+                property: String,
+                resultset: {
+                    type: Object
+                }
+
+
+            },
+
+            run: function() {
+                this.log('[DEBUG] Running ...');
+                if (!this.col || !this.property){
+                    console.log('[ERROR] Missing properties: col:' + this.col + ', property:' + this.property);
+                    return
+                }
+                this.resultset = this.col.chain().simplesort(this.property, true).limit(1).data();
+                console.log('[INFO] Result: +' + JSON.stringify(this.resultset));
+                this.done = true;
+            }
+
+        });
+    })();
+</script>

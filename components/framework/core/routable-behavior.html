@@ -1,0 +1,48 @@
+<script>
+    var bodyparser = require('body-parser');
+
+    RoutableBehavior = {
+
+        properties: {
+            method: {
+                type: String,
+                value: "all"
+            },
+            path: {
+                type: String,
+                value: ""
+            },
+            jsonparser: {
+                type: Boolean,
+                value: false
+            }
+
+        },
+
+        isRoutable: function() {
+            return true;
+        },
+
+        addRoute: function(expressapp){
+            var that= this;
+            var handler = function(req, res){
+                if (that.isService()) {
+                    that.handle(req, res);
+                }else{
+                    console.error("Only services can be used as routers");
+                    return
+                }
+
+            };
+
+            // create the route
+            if (this.jsonparser) {
+                this._jsonParser = bodyparser.json();
+                expressapp[this.method.toLowerCase()](this.path, this._jsonParser, handler);
+            } else {
+                expressapp[this.method.toLowerCase()](this.path, handler);
+            }
+        }
+
+    };
+</script>

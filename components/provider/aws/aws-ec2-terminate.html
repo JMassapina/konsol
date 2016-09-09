@@ -1,0 +1,68 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<!--
+
+ Example:
+
+<aws-ec2-terminate config="{{awsConfig}}" instanceid="k-e3eb9fd9"></aws-ec2-terminate>
+
+@element aws-ec2-terminate
+
+-->
+<script>
+    (function(){
+        var AWS = require('aws-sdk');
+
+    Polymer({
+        is: "aws-ec2-terminate",
+        properties: {
+            /**
+             * Required
+             * AWS Config object
+             */
+            config: {
+                type: Object,
+                value: undefined,
+                observer: 'changeConfigUpdate'
+            },
+            instanceid: {
+                type: String,
+                value: '',
+                observer: 'update'
+            }
+
+        },
+
+        update: function(){
+            //Abort if the config is not avail yet
+            if (! this.config){
+                return
+            }
+
+            //memoize
+            if (! this.ec2){
+                this.ec2 = new AWS.EC2(this.config)
+            }
+
+            // create the params
+            var params = {
+                InstanceIds: [this.instanceid]
+            };
+
+            // Fire the request to AWS
+            this.ec2.terminateInstances(params, function(err, data){
+                if (err) console.log(err, err.stack); //err.stack
+                else     console.log('==> EC2 Instance terminated successfully. InstanceId: ' + data.TerminatingInstances[0].InstanceId);
+            });
+
+
+        },
+        changeConfigUpdate: function(){
+            // Delete any memoized client
+            delete this.ec2;
+            this.update();
+        }
+
+    });
+    })();
+</script>

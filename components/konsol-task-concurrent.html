@@ -1,0 +1,43 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/task-behavior/task-behavior.html">
+
+<dom-module id="konsol-task-concurrent">
+  <template>
+    <content></content>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'konsol-task-concurrent',
+    behaviors: [TaskBehavior],
+    properties: {
+      countDone: {
+        type: Number,
+        value: 0,
+        notify: true
+      }
+    },
+    listeners:{
+      'task-done': 'handleTaskDone'
+    },
+    ready: function() {
+      this.childrenArray = [];
+      for(var i=0 ; i < this.children.length; i++) {
+        this.childrenArray.push(this.children[i]);
+      }
+    },
+    run: function() {
+      this.childrenArray.forEach((elem) => {elem.start = true});
+    },
+    handleTaskDone: function(e) {
+      if(this.childrenArray.indexOf(e.detail.data) != -1) {
+        this.countDone += 1;
+      }
+
+      if (this.countDone == this.children.length) {
+        this.done = true;
+      }
+    }
+  });
+</script>

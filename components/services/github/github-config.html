@@ -1,0 +1,51 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+<!--
+
+ Authentication Types:
+
+ - Basic Auth: Implemented
+ - OAuth: No implemented
+
+-->
+<script>
+    (function(){
+        var GitHubApi = require("github");
+        var scope;
+
+        Polymer({
+            is: 'github-config',
+            behaviors: [TaskBehavior],
+            properties: {
+                // Required
+                username: String,
+
+                // Required
+                password: String,
+
+                // Output
+                config: { type: Object, notify: true }
+
+            },
+
+            // TaskBehaviour hook
+            run: function() {
+                this.update();
+                this.done = true;
+            },
+
+            update: function(){
+                // Check whether mandatory properties have been set.
+                if (! this.username || ! this.password) {
+                    this.log('[WARN] Missing required fields: username, password.');
+                    return
+                }
+
+                this.config = { username: this.username, password: this.password};
+
+            }
+
+        });
+    })();
+</script>

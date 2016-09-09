@@ -1,0 +1,33 @@
+{
+  "name": "konsol",
+  "version": "0.1.0",
+  "description": "Web Console for DevOps",
+  "private": true,
+  "main": "main.js",
+  "license" : "MIT",
+  "devDependencies": {
+    "gulp": "^3.8.5",
+    "gulp-cache": "^0.2.8",
+    "gulp-cssmin": "^0.1.7",
+    "gulp-if": "^1.2.1",
+    "gulp-imagemin": "^2.2.1",
+    "gulp-minify-html": "^1.0.2",
+    "gulp-uglify": "^1.2.0",
+    "gulp-vulcanize": "^6.0.0",
+    "polybuild": "^1.0.5",
+    "polylint": "^2.3.2",
+    "vulcanize": ">= 1.4.2",
+    "electron-prebuilt": ">= 1.3.5",
+    "github": "^0.2.4",
+    "aws-sdk": "^2.2.10",
+    "node-vagrant": "^1.0.6",
+    "showdown": "~1.3.0",
+    "lokijs": "^1.3.10",
+    "map-promise": "^0.2.0",
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  }
+}

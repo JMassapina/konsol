@@ -1,0 +1,32 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../core/service-behavior.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+<link rel="import" href="bankcheque-dao.html">
+
+
+<dom-module id="bankcheque-create">
+    <template>
+        <bankcheque-dao id="dao"></bankcheque-dao>
+    </template>
+
+</dom-module>
+
+<script>
+    (function(){
+        Polymer({
+            is: 'bankcheque-create',
+            behaviors: [TaskBehavior, ServiceBehavior],
+            properties: {
+            },
+
+            run: function(){
+                console.log('[bankcheque-create] START');
+
+               var dao = this.$$('#dao');
+               return dao.test();
+
+            }
+
+        });
+    })();
+</script>

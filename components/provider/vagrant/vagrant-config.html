@@ -1,0 +1,51 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+
+
+<script>
+    (function() {
+        var vagrant = require('node-vagrant');
+
+        Polymer({
+            is: "vagrant-config",
+            behaviors: [TaskBehavior],
+            properties: {
+                /**
+                 * Required.
+                 * The credentials object that contains authentication keys
+                 */
+                cwd: {
+                    type: String
+                },
+
+                /**
+                 * The read-only `sink` attribute exports the current configuration
+                 * object based on the provided attributes.
+                 */
+                sink: {
+                    type: Object,
+                    value: undefined,
+                    notify: true
+                }
+
+            },
+
+            run: function() {
+                this._update()
+            },
+
+            _update: function(cwd){
+                this.log('Initiating Vagrant Machine Config ...');
+                if (! this.cwd) {
+                    this.log('[WARN] cwd has not been defined. Setting current dir as default: ' + this.cwd);
+                    this.cwd = process.path;
+                }
+                machine = vagrant.create({ cwd: this.cwd, env: process.env });
+                this.log('Vagrant Machine Config created successfully. ');
+                this.sink = machine;
+            }
+
+        });
+    })();
+</script>

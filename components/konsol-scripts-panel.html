@@ -1,0 +1,78 @@
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+
+<dom-module id="konsol-scripts-panel">
+  <template>
+    <style>
+      paper-menu {
+        background-color: #222222;
+        color: #FEFEFE;
+        width: 90%;
+      }
+      h3 {
+        color: rgb(129, 162, 190);
+      }
+
+    </style>
+    <iron-localstorage id="storage" name="konsol-scripts" value="{{scripts}}" on-iron-localstorage-load-empty="initializeDefaultValue"></iron-localstorage>
+    <iron-signals on-iron-signal-reloadscripts="handleReload">
+    <h3>Scripts</h3>
+    <paper-menu selected="{{selected}}">
+      <template is="dom-repeat" items="{{scripts}}">
+        <div>{{item.name}}</div>
+      </template>
+    <paper-menu>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'konsol-scripts-panel',
+    properties: {
+      scripts: {
+        type: Object,
+        notify: true
+      },
+      selected: {
+        type: Number,
+        notify: true,
+        value: 0
+      }
+    },
+    listeners : {
+      'iron-select': 'handleSelect',
+      'tap' : 'handleTap'
+    },
+    addScript: function(src) {
+      this.push('scripts', src);
+    },
+    removeScript: function(src) {
+      var index = this.scripts.indexOf(src);
+      this.splice('scripts', index, 1);
+    },
+    updateScript: function(index,key,val) {
+      this.set('scripts.'+index+'.'+key,val);
+    },
+    updateScriptByName: function(name,val) {
+      var index = this.scripts.findIndex(x => x.name == name);
+      this.updateScript(index,"data",val);
+    },
+    renameScript: function(name,newname) {
+      var index = this.scripts.findIndex(x => x.name == name);
+      this.updateScript(index,"name",newname);
+    },
+    initializeDefaultValue: function(e) {
+      this.scripts = [];
+    },
+    handleSelect: function(e) {
+      this.fire('iron-signal',{name: 'menuselect',data: this.selected});
+    },
+    handleTap: function(e) {
+      this.fire('iron-signal',{name: 'viewselect', data: 0});
+    },
+    handleReload: function(e) {
+      this.$.storage.reload();
+    }
+  })
+</script>

@@ -1,0 +1,30 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<script>
+    (function(){
+        Polymer({
+            is: 'bankcheque-dao',
+            properties: {
+            },
+
+            findById: function(id) {
+                return get(id);
+            },
+
+            findAll: function() {
+                return ["one", "two", "three"];
+            },
+
+            create: function(bankcheque) {
+                //saveInDB(bankCheque)
+                return '{"id": 34}'
+            },
+
+            test: function(){
+                console.log('[bankcheque-dao] test function invoked');
+                return 'hello world';
+            }
+
+        });
+    })();
+</script>

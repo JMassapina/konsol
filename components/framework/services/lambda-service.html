@@ -1,0 +1,33 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../core/routable-behavior.html">
+<link rel="import" href="../core/service-behavior.html">
+
+
+<dom-module id="lambda-service">
+    <template>
+    </template>
+
+</dom-module>
+
+<script>
+    (function(){
+        Polymer({
+            is: 'lambda-service',
+            behaviors: [RoutableBehavior, ServiceBehavior],
+            properties:  {
+                lambda: String
+            },
+
+            handle: function(req, res){
+                if (this.lambda){
+                    var handlerFunc = new Function("req","res", this.lambda);
+                    return handlerFunc(req, res);
+
+                }
+                console.error("lambda property has not been initialized");
+
+            }
+
+        });
+    })();
+</script>

@@ -1,0 +1,39 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/task-behavior/task-behavior.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+
+
+<dom-module id="konsol-toast">
+    <template>
+        <paper-toast id="toast" duration="{{duration}}" text="{{text}}"></paper-toast>
+    </template>
+</dom-module>
+
+<script>
+    (function() {
+        Polymer({
+            is: "konsol-toast",
+            behaviors: [TaskBehavior],
+            properties: {
+                text: {
+                    type: String,
+                    notify: true
+                },
+                duration: {
+                    type: Number,
+                    value: 3000
+                }
+            },
+
+            run: function() {
+                this.$.toast.show();
+                var that = this;
+                // TODO(javier): find out better way to detect when toast toggles to hidden.
+                this.debounce('autohide_done', function() {
+                   that.log('done!!!!');
+                   that.done = true;
+                }, this.duration);
+            }
+        });
+    })();
+</script>

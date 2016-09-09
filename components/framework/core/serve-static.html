@@ -1,0 +1,28 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="routable-behavior.html">
+
+<script>
+    (function() {
+        var express = require('express');
+
+        Polymer({
+            is: "serve-static",
+            behaviors: [RoutableBehavior],
+
+            properties: {
+                directory: {
+                    type: String
+                }
+            },
+
+            addRoute: function(expressapp){
+                if (!this.directory){
+                    console.error('Directory attribute need to be specified');
+                    return
+                }
+                console.log('[INFO] Static server setup successfully');
+                expressapp.use(express.static(this.directory));
+            }
+        });
+    })();
+</script>

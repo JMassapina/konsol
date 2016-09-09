@@ -1,0 +1,41 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/task-behavior/task-behavior.html">
+
+<dom-module id="konsol-task-sequence">
+  <template>
+    <content></content>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'konsol-task-sequence',
+    behaviors: [TaskBehavior],
+    properties: {
+      currentIndex: {
+        type: Number,
+        value: 0,
+        notify: true
+      }
+    },
+    listeners:{
+      'task-done': 'handleTaskDone'
+    },
+    ready: function() {
+      console.log(this.children);
+    },
+    run: function() {
+      this.children[0].start = true;
+    },
+    handleTaskDone: function(e) {
+      if(this.children[this.currentIndex] === e.detail.data && this.currentIndex < this.children.length) {
+        if(this.currentIndex == (this.children.length - 1)) {
+          this.done = true;
+        } else {
+          this.currentIndex += 1;
+          this.children[this.currentIndex].start = true;
+        }
+      }
+    }
+  });
+</script>

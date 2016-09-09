@@ -1,0 +1,42 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<script>
+(function(){
+	var fs = require('fs');
+
+	Polymer({
+		is: 'konsol-components-loader',
+		properties: {
+			file:  {
+				type: String,
+				notify: true,
+				value: 'components.json'
+			},
+			htmlFiles: {
+				type: Array,
+				notify: true
+			}
+		},
+		listeners: {
+			'konsol-components-load' : 'loadComponents'
+		},
+		loadComponents: function(e) {
+			var that = this;
+			fs.readFile('components.json',function(err,data) {
+				if (err) {
+					console.log(err);
+				} else {
+					that.htmlFiles = JSON.parse(data);
+					that.htmlFiles.forEach(function(el, index, array) {
+						Polymer.Base.importHref(el,function(e){
+							console.log("Import OK: "+ el);
+						}, function(e) {
+							console.log("Import Err: "+ el);
+						});
+					});
+				}
+			});
+		}
+	});
+})();
+</script>

@@ -1,0 +1,74 @@
+<http-response status="200"
+               headers="{'Allow':['POST','GET'], 'Refresh': 'Refresh:20; http://www.ietf.org/rfc/rfc2324.txt'}"
+               body="I am a coffee cup"></http-response>
+
+
+import OwnerException.html
+
+<http-server listen="8080">
+
+  <!-- trivial case -->
+  <http-get path="/" handler='return "hello world"'></http-get>
+
+  <!-- hello world -->
+  <http-get path="/hello/:name"
+            params={{params}}
+            handler='return "hello" + {{params.name}}'></http-get>
+
+
+  <!-- middleware -->
+  <http-get path="/hello/:name"
+            params={{params}}
+            handler='return "hello" + {{params.name}}'>
+      <middleware-auth key="api-key" value="secret123!"> </middleware-auth>
+
+  </http-get>
+
+
+  <!-- real world -->
+
+  <http-post path="/services/order-bankcheque">
+      <!-- middleware -->
+      <middleware-saml-validation></middleware-saml-validation>
+      <!-- business logic -->
+      <bank-cheque-service operation="create"></bank-cheque-service>
+  </http-post>
+
+
+
+</http-server>
+
+
+<!--
+
+ EXAMPLE OF PROG STRUCTURE
+-->
+
+file :: server.html
+
+<http-server listen="8000">
+
+    <group-routes id="public">
+        <middlerawe-default>
+            <saml-validation></saml-validation>
+        </middlerawe-default>
+
+        <bank-cheque-endpoint></bank-cheque-endpoint>
+        <bpay-payment-endpoint></bpay-payment-endpoint>
+        <account-manager-endpoint></account-manager-endpoint>
+    </group-routes>
+
+
+    <group-routes id="private">
+        <http-admin-endpoint>
+            <basic-auth user="x" pass="1123!"></basic-auth>
+        </http-admin-endpoint>
+    </group-routes>
+</http-server>
+
+
+file :: bank-cheque-endpoint.html
+
+<http-post path="/services/order-bankcheque">
+    <bank-cheque-create></bank-cheque-create>
+</http-post>

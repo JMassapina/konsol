@@ -1,0 +1,50 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="mark-down.html">
+<link rel="import" href="test-action.html">
+
+
+<dom-module id="action-pages">
+    <template>
+        <template is="dom-repeat" items="{{actionpages}}">
+            <a href="{{item.link}}">{{item.name}}</a>
+        </template>
+        <mark-down text="{{text}}"></mark-down>
+        <hr/>
+    </template>
+</dom-module>
+
+<script>
+    (function() {
+        var fs = require("fs");
+
+        Polymer({
+            is: "action-pages",
+            properties: {
+                actionpages: {type: Array, notify: true },
+                text: {type: String, notify: true }
+            },
+
+            attached: function() {
+                var that = this;
+                //console.log("Discovering action-pages...");
+                fs.readdir("menu", function(err, files) {
+                    var array = [];
+                    for (var i=0; i < files.length; i++) {
+                        //console.log('Found page: ' + files[i]);
+                        array.push({name: files[i].slice(0,-3),
+                                    link: 'menu/' + files[i]}); // .html (0..-5), .md (0..-3)
+                    };
+                    that.actionpages = array;
+                    that.text = fs.readFile(that.actionpages[0].link, 'utf8', function(err, data){
+                        if (err){
+                            console.log(err);
+                        }
+                        that.text = data;
+                    });
+                });
+
+            }
+        });
+    })();
+
+</script>

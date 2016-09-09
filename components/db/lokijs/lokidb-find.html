@@ -1,0 +1,44 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+<!--
+lokidb-load: Creates a database. This class is only used to initialise the database, add collections and load/save.
+
+
+-->
+
+<script>
+    (function() {
+        var loki = require("lokijs");
+
+        Polymer({
+            is: "lokidb-find",
+            behaviors: [TaskBehavior],
+            properties: {
+                col: {
+                    type: Object,
+                    value: undefined
+                },
+                query: {
+                    type: Object
+                },
+                resultset: {
+                    type: Object
+                }
+
+
+            },
+
+            run: function() {
+                if (!this.col || !this.query){
+                    this.log('[ERROR] Missing properties: col:' + this.col + ', query:' + this.query);
+                    return
+                }
+                this.resultset = this.col.find(this.query);
+                this.log('[INFO] Result: +' + JSON.stringify(this.resultset));
+                this.done = true;
+            }
+
+        });
+    })();
+</script>

@@ -1,0 +1,98 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+<!--
+Documentation: https://www.npmjs.com/package/github
+
+Example:
+
+# Fetching by id: `<github-gist-get id="<your_id>">`
+# Fetching by username: `<github-gist-get user="jteso">`
+
+@element github-gist-create
+
+-->
+<script>
+    (function(){
+        var GitHubApi = require("github");
+        var scope;
+
+        Polymer({
+            is: 'github-gist-create',
+            behaviors: [TaskBehavior],
+            properties: {
+                // Required
+                config: Object,
+
+                // Required
+                filename: String,
+
+                // Required
+                content: String,
+
+                // Optional
+                description: { type: String, value: ''},
+
+                // Optional. False by default
+                public: { type: Boolean, value: false }
+
+            },
+
+            // TaskBehaviour hook
+            run: function() {
+                this.update();
+            },
+
+            update: function(){
+                // Check whether mandatory properties have been set
+                if (! this.config || ! this.filename || ! this.content) {
+                    this.log('[WARN] Missing required fields: config, filename, content.');
+                    return
+                }
+
+                //memoize
+                if (! this.github){
+                    this.github = new GitHubApi({
+                        // required
+                        version: "3.0.0",
+                        headers: {
+                            "user-agent": "Konsol" // GitHub is happy with a unique user agent
+                        }
+                    });
+                }
+
+
+                // send request to github
+                this._sendGithubRequest(this.filename, this.content, this.description, this.public);
+            },
+
+            _sendGithubRequest: function(filename, content, description, public){
+                // Hacky way to reach the konsol.log inside the callback.
+                scope = this;
+
+                var params = {
+                    description: description,
+                    public: public,
+                    files: { }
+                };
+                params.files[filename] = {content: content}; //dynamic key injected here
+
+
+                this.log('Authenticating username: ...' + this.config.username);
+                this.github.authenticate({
+                   type: "basic",
+                   username: this.config.username,
+                   password: this.config.password
+                });
+
+                this.log('Creating gist filename: ' + this.filename + ' ...');
+                this.github.gists.create(params, this._handleResponse);
+
+            },
+            _handleResponse: function(err, data){
+                if (err)  scope.log('--> [ERROR] ' + err);
+                else      scope.log('==> GitHub reponse: ' + JSON.stringify(data));
+            }
+        });
+    })();
+</script>

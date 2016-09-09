@@ -1,0 +1,73 @@
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="ui/mark-down.html">
+<link rel="import" href="ui/test-action.html">
+
+<dom-module id="konsol-markdown-panel">
+  <template>
+    <style>
+      paper-menu {
+        background-color: #222222;
+        color: #FEFEFE;
+        width: 90%;
+      }
+      h3 {
+        color: rgb(129, 162, 190);
+      }
+
+    </style>
+    <h3>Markdown Pages</h3>
+    <paper-menu selected="{{selected}}">
+      <template is="dom-repeat" items="{{actionpages}}">
+        <div>{{item.name}}</div>
+      </template>
+    <paper-menu>
+  </template>
+</dom-module>
+
+<script>
+(function() {
+    var fs = require("fs");
+
+    Polymer({
+        is: "konsol-markdown-panel",
+        properties: {
+            actionpages: {
+              type: Array,
+              notify: true
+            },
+            text: {
+              type: String,
+              notify: true
+            },
+            selected: {
+              type: Number,
+              notify: true
+            },
+        },
+        listeners : {
+          'iron-select': 'handleSelect',
+          'tap': 'handleTap'
+        },
+        attached: function() {
+            var that = this;
+            //console.log("Discovering action-pages...");
+            fs.readdir("menu", function(err, files) {
+                var array = [];
+                for (var i=0; i < files.length; i++) {
+                    //console.log('Found page: ' + files[i]);
+                    array.push({name: files[i].slice(0,-3),
+                                link: 'menu/' + files[i]}); // .html (0..-5), .md (0..-3)
+                };
+                that.actionpages = array;
+            });
+        },
+        handleSelect: function(e) {
+          this.fire('iron-signal',{name: 'markdownselect', data: this.actionpages[this.selected]});        
+        },
+        handleTap: function(e) {
+          this.fire('iron-signal',{name: 'viewselect', data: 1});
+        }
+    });
+})();
+</script>

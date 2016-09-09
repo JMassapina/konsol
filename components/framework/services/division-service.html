@@ -1,0 +1,43 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../core/routable-behavior.html">
+<link rel="import" href="../core/service-behavior.html">
+
+<link rel="import" href="division-dao.html">
+
+
+<dom-module id="division-service">
+    <template>
+        <division-dao id="dao"></division-dao>
+    </template>
+
+</dom-module>
+
+<script>
+    (function(){
+        Polymer({
+            is: 'division-service',
+            behaviors: [RoutableBehavior, ServiceBehavior],
+
+            handle: function(req, res){
+                console.log('[division-srv] hit!');
+
+                var x = req.query.x;
+                var y = req.query.y;
+                var result = this.$$('#dao').calculate(x, y);
+
+//                var response = this.$$.resp;
+//                response.x = x;
+//                response.y = y;
+//                response.result = result;
+
+                // TODO(javier): add support for other encoders: xml, txt, csv, ...
+                res.json({result: result});
+
+            },
+            encode: function(obj){
+
+            }
+
+        });
+    })();
+</script>

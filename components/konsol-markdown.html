@@ -1,0 +1,75 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="ui/mark-down.html">
+<link rel="import" href="ui/test-action.html">
+
+<dom-module id="konsol-markdown">
+  <template>
+    <style>
+    h2 {      
+      color: rgb(129, 162, 190);
+    }
+    [vertical] {
+      @apply(--layout-vertical);
+    }
+    [horizontal]{
+      @apply(--layout-horizontal);
+    }
+    [center]{
+      @apply(--layout-center);
+    }
+
+    :host /deep/ ::-webkit-scrollbar {
+        width: 0.5em;
+    }
+
+    :host /deep/ ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+
+    :host /deep/ ::-webkit-scrollbar-thumb {
+        background: rgba(100, 100, 100, 0.8);
+    }
+
+    :host /deep/ ::-webkit-scrollbar-corner,
+    :host /deep/ ::-webkit-scrollbar-thumb:window-inactive {
+        background: rgba(100, 100, 100, 0.4);
+    }
+    </style>
+    <iron-signals on-iron-signal-markdownselect="handleSelect">
+    <div vertical>
+      <h2>Konsol Page - <span>{{page}}</span></h2>
+      <mark-down text="{{text}}"></mark-down>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+(function() {
+    var fs = require("fs");
+
+    Polymer({
+        is: "konsol-markdown",
+        properties: {
+            text: {
+              type: String,
+              notify: true
+            },
+            page: {
+              type: String,
+              notify: true
+            }
+        },
+        handleSelect: function(e){
+          var that = this;
+          fs.readFile(e.detail.link, 'utf8', function(err, data){
+              if (err){
+                  console.log(err);
+              }
+              that.text = data;
+          });
+          this.page = e.detail.name;
+        }
+    });
+})();
+</script>

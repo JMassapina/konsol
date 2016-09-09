@@ -1,0 +1,206 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/juicy-ace-editor/juicy-ace-editor.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../components/ui/test-action.html">
+
+<dom-module id="konsol-editor">
+  <template>
+    <style>
+    paper-icon-button {
+      display: block;
+      color: rgb(129, 162, 190);
+    }
+    [vertical] {
+      @apply(--layout-vertical);
+    }
+    [horizontal]{
+      @apply(--layout-horizontal);
+    }
+    [center]{
+      @apply(--layout-center);
+    }
+    paper-input{
+      --paper-input-container-input-color: #FEFEFE;
+      --paper-input-container-focus-color: rgb(129, 162, 190);
+    }
+    .outputContent {
+      font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
+      font-size: 12px;
+      font-style: normal;
+      color: rgb(129, 162, 190);
+      overflow: auto;
+    }
+    .logContent {
+      color: rgb(255, 255, 182);
+    }
+
+    :host /deep/ ::-webkit-scrollbar {
+        width: 0.5em;
+    }
+
+    :host /deep/ ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+
+    :host /deep/ ::-webkit-scrollbar-thumb {
+        background: rgba(100, 100, 100, 0.8);
+    }
+
+    :host /deep/ ::-webkit-scrollbar-corner,
+    :host /deep/ ::-webkit-scrollbar-thumb:window-inactive {
+        background: rgba(100, 100, 100, 0.4);
+    }
+    </style>
+    <iron-signals on-iron-signal-menuselect="handleSelect"></iron-signals>
+    <iron-localstorage id="storage" name="konsol-scripts" value="{{scripts}}"></iron-localstorage>
+    <iron-a11y-keys target="[[target]]" keys="ctrl+s" on-keys-pressed="handleKeyCtrlS"></iron-a11y-keys>
+    <div horizontal center>
+      <paper-icon-button icon="av:play-arrow" alt="Run" title="Run" on-tap="handleRun"></paper-icon-button>
+      <paper-icon-button icon="icons:note-add" alt="New" title="New" on-tap="handleNew"></paper-icon-button>
+      <paper-icon-button icon="icons:save" alt="Save" title="Save" on-tap="handleSave"></paper-icon-button>
+      <paper-icon-button icon="social:share" alt="Share Gist" title="Share Gist"></paper-icon-button>
+      <div>&nbsp;</div>
+      <paper-input type="text" id="scriptName" value="{{scriptName}}" label="script name" error="name is required!" autoValidate></paper-input>
+    </div>
+    <br/>
+    <juicy-ace-editor id="editor" fontsize="14px" theme="ace/theme/idle_fingers" mode="ace/mode/html" wrapmode="false"></juicy-ace-editor>
+    <br/><br/>
+    <div id="code"></div>
+    <div id="output" class="outputContent" style="height:250px; background-color: #333333;">
+    </div>
+  </template>
+</dom-module>
+
+<script>
+
+  const {ipcRenderer} = require('electron')
+
+  Polymer({
+    is: 'konsol-editor',
+    ready: function() {
+      var that=this;
+      ipcRenderer.on('konsol-log', function(event, arg){
+        console.log();
+        Polymer.dom(that.$.output).innerHTML += '<div class="logContent">['+Date.now()+'] Log: '+`${arg}`+'</div>';
+        that.$.output.scrollTop = that.$.output.scrollHeight;
+      });
+    },
+    properties: {
+      selected: {
+        type: Number,
+        notify: true,
+        observer: '_selectedChanged'
+      },
+      target: {
+        type: Object,
+        value: function() {
+          return document.body;
+        }
+      }
+    },
+    attached: function() {
+      this.setDimension(this);
+      var that = this;
+      window.addEventListener('resize', function(){
+        that.setDimension(that);
+      });
+      if(this.scripts[0]) {
+        this.selected = 0;
+        //this.$.editor.editor.setValue(this.scripts[0].data);
+        //this.scriptName = this.scripts[0].name;
+      }
+
+    },
+
+    listeners : {
+      'task-start': 'handleTaskStartLog',
+      'task-done': 'handleTaskDoneLog',
+      'task-log': 'handleLog',
+      'iron-select': 'handleSelect'
+    },
+    setDimension: function(obj) {
+      var width = window.innerWidth - 290;
+      var height = window.innerHeight - 400;
+      obj.$.editor.style.width = width +'px';
+      obj.$.output.style.width = width + 'px';
+      obj.$.editor.style.height = height +'px';
+    },
+    handleRun: function(e) {
+      var runScript = this.$.editor.editor.getValue();
+      Polymer.dom(this.$.code).innerHTML = '<template is="dom-bind" id="temprun"><konsol-task-sequence auto>'+runScript+'</konsol-task-sequence></template>';
+    },
+    handleTaskStartLog: function(e) {
+      Polymer.dom(this.$.output).innerHTML += '<div>['+Date.now()+'] Task Start: ' + e.detail.data.localName+'</div>';
+      this.$.output.scrollTop = this.$.output.scrollHeight;
+    },
+    handleTaskDoneLog: function(e) {
+      Polymer.dom(this.$.output).innerHTML += '<div>['+Date.now()+'] Task Finished: ' + e.detail.data.localName+' Status: '+e.detail.data.returnCode+'</div>';
+      this.$.output.scrollTop = this.$.output.scrollHeight;
+    },
+    handleLog: function(e) {
+      console.log("Konsol Log:",e.detail.data.localName);
+      Polymer.dom(this.$.output).innerHTML += '<div class="logContent">['+Date.now()+'] [' + e.detail.data.element+ '] Log: '+JSON.stringify(e.detail.data.message)+'</div>';
+      this.$.output.scrollTop = this.$.output.scrollHeight;
+    },
+    _selectedChanged: function(newValue, oldValue) {
+      if (newValue != oldValue) {
+        if(this.scripts[newValue]) {
+          this.scriptName = this.scripts[newValue].name;
+          //Load and Set cursor to the beginning of content
+          this.$.editor.editor.setValue(this.scripts[newValue].data, -1);
+        }
+      }
+    },
+    handleSelect: function(e) {
+      this.selected = e.detail;
+    },
+    handleSave: function(e) {
+      if(this.scriptName && this.scriptName != "") {
+        if(this.scripts[this.selected]){
+          this.scripts[this.selected].name = this.scriptName;
+          this.scripts[this.selected].data = this.$.editor.editor.getValue();
+        } else {
+          this.addScript({name: this.scriptName, data: this.$.editor.editor.getValue()});
+        }
+        this.$.storage.save();
+        this.fire('iron-signal',{name: 'reloadscripts',data: this.selected});
+      } else {
+        alert("Script Name can't be empty!");
+      }
+    },
+    handleNew: function(e) {
+      this.selected = this.scripts.length;
+      this.scriptName = '';
+      this.$.editor.editor.setValue('');
+    },
+    addScript: function(src) {
+      this.push('scripts', src);
+    },
+    removeScript: function(src) {
+      var index = this.scripts.indexOf(src);
+      this.splice('scripts', index, 1);
+    },
+    updateScript: function(index,key,val) {
+      this.set('scripts.'+index+'.'+key,val);
+    },
+    updateScriptByName: function(name,val) {
+      var index = this.scripts.findIndex(x => x.name == name);
+      this.updateScript(index,"data",val);
+    },
+    renameScript: function(name,newname) {
+      var index = this.scripts.findIndex(x => x.name == name);
+      this.updateScript(index,"name",newname);
+    },
+    handleKeyCtrlS: function(e) {
+      this.handleSave();
+    }
+  })
+</script>

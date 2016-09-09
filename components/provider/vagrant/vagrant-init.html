@@ -1,0 +1,55 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+<!--
+
+Example:
+<vagrant-init box="ubuntu/trusty64"></vagrant-init>
+
+@element vagrant-init
+
+-->
+<script>
+    (function(){
+        var vagrant = require('node-vagrant');
+        var scope;
+
+        Polymer({
+            is: 'vagrant-init',
+            behaviors: [TaskBehavior],
+            properties: {
+                // Required
+                config: Object,
+
+                // Required
+                box: String,
+
+                // Location to place the Vagrantfile (default. process.cwd())
+                path: String
+            },
+
+            // onStart lifecycle ...
+            run: function() {
+                this.update();
+            },
+
+            update: function(){
+                // Check whether mandatory properties have been set
+                if (! this.config || !this.box) {
+                    this.log('[WARN] Missing required fields: config, box');
+                    return
+                }
+
+                scope = this;
+                this.config.init(this.box, function(err, data){
+                   if (err) scope.log('[ERROR]' + err);
+                   else {
+                       scope.log('[INFO] Response: ' + JSON.stringify(data));
+                       this.done = true;
+                   }
+                })
+            }
+
+        });
+    })();
+</script>

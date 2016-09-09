@@ -1,0 +1,26 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/task-behavior/task-behavior.html">
+
+<dom-module id="test-action">
+    <template>
+        <span>{{title}}</span>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: "test-action",
+        behaviors: [TaskBehavior],
+        properties: {
+            title: {
+                type: String,
+                notify: true
+            }
+        },
+        run: function() {
+            this.title = "I am a polymer element";
+            console.log('test-action executed !!!');
+        }
+    });
+
+</script>

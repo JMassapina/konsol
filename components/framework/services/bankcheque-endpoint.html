@@ -1,0 +1,10 @@
+<http-post path="/services/order-bankcheque" params="{{params}}">
+    <request-validator params="{{params}}">
+        <request-param name="account" required="true"></request-param>
+        <request-param name="amount" type="String" required="true"></request-param>
+    </request-validator>
+
+    <!-- invoke business logic -->
+
+    <bank-cheque-create request="{{params}}"></bank-cheque-create>
+</http-post>

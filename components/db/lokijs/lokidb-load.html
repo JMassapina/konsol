@@ -1,0 +1,79 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+<!--
+lokidb-load: Creates a database. This class is only used to initialise the database, add collections and load/save.
+
+
+-->
+
+<script>
+    (function() {
+        var loki = require("lokijs");
+
+        Polymer({
+            is: "lokidb-load",
+            behaviors: [TaskBehavior],
+            properties: {
+                /**
+                 * Required.
+                 * The database name
+                 */
+                dbname: {
+                    type: String
+                },
+                colname: {
+                    type: String
+                },
+                /**
+                 * Output - the database object
+                 */
+                db: {
+                    type: Object,
+                    value:undefined,
+                    notify: true
+                },
+                col: {
+                    type: Object,
+                    value: undefined,
+                    notify: true
+                }
+
+            },
+
+            run: function() {
+                if (!this.dbname || !this.colname){
+                    return
+                }
+
+                // open db
+                this.log('[INFO] Opening database: ' + this.dbname + ' ...');
+                this.db = new loki(this.dbname);
+
+                // load collection
+                var that = this;
+                this.db.loadDatabase({}, function () {
+                    console.log('[INFO] Loading collection: ' + that.colname + ' ...');
+                    var col = that.db.getCollection(that.colname);
+
+                    // create collection if it does not exist
+                    if (!col) {
+                        col = that._createCollection(that.db, that.colname);
+                    }
+
+                    // notify
+                    that.col = col;
+                    that.done = true;
+
+                });
+            },
+            _createCollection: function(db, collectionName){
+                console.log('[INFO] Collection not found. Creating now: ' + collectionName + ' ...' );
+                var col = db.addCollection(collectionName);
+                db.saveDatabase();
+                return col;
+            }
+
+        });
+    })();
+</script>

@@ -1,0 +1,38 @@
+{
+  "name": "konsol",
+  "version": "0.7.0",
+  "authors": [
+    "Januar Wayong <januar@gmail.com>"
+  ],
+  "description": "Konsol - The DevOps Console",
+  "main": "index.html",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "web-component",
+    "web-components",
+    "KapalHQ",
+    "polymer"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.6.0",
+    "iron-elements": "PolymerElements/iron-elements#^1.0.0",
+    "docker-elements": "KapalHQ/docker-elements#master",
+    "task-behavior": "https://github.com/kapalhq/task-behavior.git#master",
+    "paper-elements": "PolymerElements/paper-elements#^1.0.0",
+    "neon-elements": "PolymerElements/neon-elements#^1.0.0",
+    "juicy-ace-editor": "Juicy/juicy-ace-editor#^1.1.1",
+    "ace-build": "ajaxorg/ace-builds#^1.2.0"
+  },
+  "devDependencies": {
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "iron-component-page": "polymerelements/iron-component-page#^1.0.0"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
+}

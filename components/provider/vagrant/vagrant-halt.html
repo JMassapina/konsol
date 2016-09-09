@@ -1,0 +1,46 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/task-behavior/task-behavior.html">
+
+<!--
+
+@element vagrant-up
+
+-->
+<script>
+    (function(){
+        var vagrant = require('node-vagrant');
+        var scope;
+
+        Polymer({
+            is: 'vagrant-halt',
+            behaviors: [TaskBehavior],
+            properties: {
+                // Required
+                config: Object
+
+            },
+
+            // onStart lifecycle ...
+            run: function() {
+                this.update();
+            },
+
+            update: function(){
+                scope = this;
+                // Check whether mandatory properties have been set
+                if (! this.config) {
+                    return
+                }
+
+                scope.log('[INFO] Halting down your environment ...');
+                this.config.halt(function(err, data){
+                   if (err) scope.log('[ERROR]' + err);
+                   else {
+                       scope.log('[INFO] Response: ' + JSON.stringify(data));
+                   }
+                })
+            }
+
+        });
+    })();
+</script>

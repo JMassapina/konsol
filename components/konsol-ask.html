@@ -1,0 +1,72 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/task-behavior/task-behavior.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+
+
+<dom-module id="konsol-ask">
+    <template>
+        <!--<style>-->
+            <!--:host {-->
+                <!--z-index:16777271;-->
+            <!--}-->
+
+            <!--paper-dialog {-->
+                <!--z-index: 16777271;-->
+            <!--}-->
+        <!--</style>-->
+        <paper-dialog id="dialog">
+            <h2>{{title}}</h2>
+            <div class="body">{{detail}}</div>
+            <paper-input id="input" autofocus on-change="clicked"></paper-input>
+            <div class="buttons">
+                <paper-button dialog-dismiss on-click="dismissed">Cancel</paper-button>
+                <paper-button dialog-confirm on-click="clicked">OK</paper-button>
+            </div>
+        </paper-dialog>
+    </template>
+</dom-module>
+
+<script>
+    (function() {
+        Polymer({
+            is: "konsol-ask",
+            behaviors: [TaskBehavior],
+            properties: {
+                /**
+                 * Required.
+                 * The database name
+                 */
+                title: {
+                    type: String,
+                    notify: true
+                },
+                answer: {
+                    type: String,
+                    notify: true
+                }
+
+            },
+
+            run: function() {
+                this.$.dialog.open();
+//                this.$.input.focused = true;
+            },
+            clicked: function(e){
+                this.log('OK clicked...');
+                this.answer = this.$.input.value;
+                this.$.dialog.close();
+                this.done = true;
+            },
+            dismissed: function(e){
+                this.log('Cancel clicked ...');
+                this.$.dialog.close();
+                this.done = false; // TODO(javier): find out way to cancel more elegantly
+            }
+
+
+        });
+    })();
+</script>

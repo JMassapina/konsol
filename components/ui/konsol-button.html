@@ -1,0 +1,55 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+
+
+<dom-module id="konsol-button">
+    <template>
+        <paper-icon-button icon="av:play-arrow" alt="Run" title="[[title]]" on-tap="handleRun"></paper-icon-button>
+        <div id="code" hidden><content></content></div>
+    </template>
+
+</dom-module>
+
+<script>
+    (function(){
+        var fs = require("fs");
+
+        Polymer({
+            is: 'konsol-button',
+            properties: {
+                title: {
+                    type: String,
+                    value: "Run",
+                    notify: true
+                },
+                action: {
+                    type: String,
+                    value: function() { return this.text }
+                }
+            },
+            handleRun: function(e) {
+                this.$.code.children[0].start = true;
+                /*
+                var that = this;
+                if (!this.action){
+                    console.log('data in the textcontent:' + this.$.actionflow.innerHTML);
+                    data = this.$.actionflow.innerHTML;
+                    Polymer.dom(that.$.code).innerHTML = '<template is="dom-bind" id="temprun">' + data + '</template>';
+                }else {
+                    console.log('executing actionflow: ' + this.action + ' ...');
+                    that.text = fs.readFile(this.action, 'utf8', function (err, data) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        console.log('data:' + data);
+                        Polymer.dom(that.$.code).innerHTML = '<template is="dom-bind" id="temprun">' + data + '</template>';
+                    });
+                }
+                */
+
+            }
+
+        });
+    })();
+</script>
